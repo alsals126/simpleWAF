@@ -21,7 +21,47 @@ class IPItem extends Component {
     }
 }
 class IPList extends Component {
+    constructor(props) {
+        super(props)
+        // this.state = {
+        //     ips: [{
+        //         id: 0,
+        //         ip: ''
+        //     }]
+        // }
+    }
+
+    // selectIp = () => {
+    //     var result = true
+
+    //     axios({
+    //         method:"get",
+    //         url:endpoint+"/ip-proxy"
+    //     })
+    //     .then(function (res) {
+    //         // response  
+    //         console.log("ASDf")
+    //         // res.data.map((item)=>{
+    //         //     var map = new Map(['id',item.Id], ['ip', item.Ip])
+    //         //     this.setState((state) => ({
+    //         //         ips: state.ips.concat(map)
+    //         //     }))
+    //         // })  
+    //     }).catch((error) => {
+    //         result = false
+
+    //         alert('에러발생\n관리자에게 문의해주세요')
+    //         console.log(error)
+    //     }).then(() => {
+    //         // 항상 실행
+    //         this.setState({ ip: '' }) //화살표 함수에서 작동됨.. 왜지?
+    //     });
+
+    //     return result
+    // }
+
     render() {
+        //this.selectIp()
         return (
             <table>
                 <tbody>
@@ -94,11 +134,50 @@ class IPAdder extends Component {
 }
 class IPPolicy extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             ips: []
-        }
+        };
+        this.selectIp = this.selectIp.bind(this)
+        // this.state = {
+        //     ips: [{
+        //         id: 0,
+        //         ip: ''
+        //     }]
+        // }
     }
+    selectIp = (e) => {
+        var result = true
+
+        axios({
+            method:"get",
+            url:endpoint+"/ip-proxy"
+        })
+        .then(function (res) {
+            // response  
+            console.log(res.data)
+            res.data.map((item)=>{
+                console.log(item)
+                const ipInfo = [{id: item.Id, ip: item.Ip}]
+                //var map = new Map(['id',item.Id], ['ip', item.Ip])
+                console.log(ipInfo)
+                this.setState((state) => ({
+                    ips: state.ips.concat(ipInfo)
+                }))
+            })  
+        }).catch((error) => {
+            result = false
+
+            alert('에러발생\n관리자에게 문의해주세요')
+            console.log(error)
+        }).then(() => {
+            // 항상 실행
+            this.setState({ ip: '' }) //화살표 함수에서 작동됨.. 왜지?
+        });
+
+        return result
+    }
+
     handleIPAdd = (newIp) => {
         this.setState((state) => ({
             ips: state.ips.concat(newIp)
@@ -111,13 +190,16 @@ class IPPolicy extends Component {
             })
         }))
     }
+
+    
+
     render() {
         return (
             <div>
                 <IPAdder handleIPAdd={this.handleIPAdd} /><br/>
                 <IPList
                     ips={this.state.ips}
-                    handleIPRemove={this.handleIPRemove} />
+                    handleIPRemove={this.selectIp} />
             </div>
         );
     }
