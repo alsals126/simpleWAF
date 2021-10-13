@@ -1,86 +1,29 @@
 import React, { Component } from 'react'
 import axios from "axios";
 import ReactDOM from 'react-dom'
+import IpItem from './IPItem'
 
 let endpoint = "http://127.0.0.1:8080";
 
-class IPItem extends Component {
-    render() {
-        const {text} = this.props.ip
-        return (
-            <React.Fragment>
-                <td>
-                    <span>{text}</span>
-                </td>
-                <td>
-                    <button onClick={() =>
-                        this.props.handleIPRemove(this.props.idx)}>X</button>
-                </td>
-            </React.Fragment>
-        )
-    }
-}
 class IPList extends Component {
-    constructor(props) {
-        super(props)
-        // this.state = {
-        //     ips: [{
-        //         id: 0,
-        //         ip: ''
-        //     }]
-        // }
-    }
-
-    // selectIp = () => {
-    //     var result = true
-
-    //     axios({
-    //         method:"get",
-    //         url:endpoint+"/ip-proxy"
-    //     })
-    //     .then(function (res) {
-    //         // response  
-    //         console.log("ASDf")
-    //         // res.data.map((item)=>{
-    //         //     var map = new Map(['id',item.Id], ['ip', item.Ip])
-    //         //     this.setState((state) => ({
-    //         //         ips: state.ips.concat(map)
-    //         //     }))
-    //         // })  
-    //     }).catch((error) => {
-    //         result = false
-
-    //         alert('에러발생\n관리자에게 문의해주세요')
-    //         console.log(error)
-    //     }).then(() => {
-    //         // 항상 실행
-    //         this.setState({ ip: '' }) //화살표 함수에서 작동됨.. 왜지?
-    //     });
-
-    //     return result
-    // }
-
     render() {
-        //this.selectIp()
+        const { Ipitem } = this.props;
+        console.log(Ipitem)
         return (
-            <table>
-                <tbody>
-                    {
-                        this.props.ips.map((ip, idx) => {
-                            return(
-                                <tr>
-                                <IPItem
-                                    idx={idx}
-                                    ip={ip}
-                                    handleIPRemove={this.props.handleIPRemove} />
-                                </tr>
-                            )
-                        })
-                    }   
-                </tbody>
-            </table>
-        )
-    }
+          <ul>
+            {Ipitem &&
+              Ipitem.map((itemdata) => {
+                  console.log(itemdata)
+                return (
+                  <IpItem
+                    id={itemdata.id}
+                    ip={itemdata.ip}
+                  />
+                );
+              })}
+          </ul>
+        );
+      }
 }
 class IPAdder extends Component {
     constructor(props) {
@@ -133,73 +76,64 @@ class IPAdder extends Component {
     }
 }
 class IPPolicy extends Component {
-    constructor(props) {
-        super(props);
+    constructor(props){
+        super(props)
         this.state = {
-            ips: []
+            loading: false,
+            Iplist: []
         };
-        this.selectIp = this.selectIp.bind(this)
-        // this.state = {
-        //     ips: [{
-        //         id: 0,
-        //         ip: ''
-        //     }]
-        // }
     }
-    selectIp = (e) => {
-        var result = true
 
+    loadIp = async () =>{
+        var tem = []
         axios({
             method:"get",
             url:endpoint+"/ip-proxy"
         })
-        .then(function (res) {
+        .then((res) => {
             // response  
-            console.log(res.data)
-            res.data.map((item)=>{
-                console.log(item)
-                const ipInfo = [{id: item.Id, ip: item.Ip}]
-                //var map = new Map(['id',item.Id], ['ip', item.Ip])
-                console.log(ipInfo)
-                this.setState((state) => ({
-                    ips: state.ips.concat(ipInfo)
-                }))
+            res.data.forEach((item) => {
+                var ipInfo = { id: item.Id, ip: item.Ip };
+                tem = tem.concat(ipInfo)
             })  
+            this.setState({
+                loading: true,
+                Iplist: tem
+            })
         }).catch((error) => {
-            result = false
-
             alert('에러발생\n관리자에게 문의해주세요')
             console.log(error)
-        }).then(() => {
-            // 항상 실행
-            this.setState({ ip: '' }) //화살표 함수에서 작동됨.. 왜지?
-        });
-
-        return result
-    }
-
-    handleIPAdd = (newIp) => {
-        this.setState((state) => ({
-            ips: state.ips.concat(newIp)
-        }))
-    }
-    handleIPRemove = (ipIndex) => {
-        this.setState((state) => ({
-            ips: state.ips.filter((_, idx) => {
-                return idx !== ipIndex
+            this.setState({
+                loading: false
             })
-        }))
+        })
     }
+    // handleIPAdd = (newIp) => {
+    //     this.setState((state) => ({
+    //         ips: state.ips.concat(newIp)
+    //     }))
+    // }
+    // handleIPRemove = (ipIndex) => {
+    //     this.setState((state) => ({
+    //         ips: state.ips.filter((_, idx) => {
+    //             return idx !== ipIndex
+    //         })
+    //     }))
+    // }
 
-    
+    componentDidMount(){
+        this.loadIp();
+    }
 
     render() {
+        const {Iplist} = this.state;
+        console.log(Iplist)
         return (
             <div>
-                <IPAdder handleIPAdd={this.handleIPAdd} /><br/>
-                <IPList
-                    ips={this.state.ips}
-                    handleIPRemove={this.selectIp} />
+                <IPAdder
+                // handleIPAdd={this.handleIPAdd} 
+                 /><br/>
+                <IPList Ipitem={Iplist}/>
             </div>
         );
     }
