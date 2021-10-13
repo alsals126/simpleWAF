@@ -8,16 +8,15 @@ let endpoint = "http://127.0.0.1:8080";
 class IPList extends Component {
     render() {
         const { Ipitem } = this.props;
-        console.log(Ipitem)
         return (
           <ul>
             {Ipitem &&
               Ipitem.map((itemdata) => {
-                  console.log(itemdata)
                 return (
                   <IpItem
                     id={itemdata.id}
                     ip={itemdata.ip}
+                    loadIp={this.props.loadIp}
                   />
                 );
               })}
@@ -66,10 +65,7 @@ class IPAdder extends Component {
                 <input type='text' onChange={this.handleChange} value={this.state.ip} />
                 <button onClick={ () => 
                     this.insertIp() ?         
-                    this.props.handleIPAdd({
-                        completed: false,
-                        text: this.state.ip
-                    }) : null
+                    this.props.loadIp() : null
                 }>Add</button>
             </div>
         )
@@ -84,6 +80,7 @@ class IPPolicy extends Component {
         };
     }
 
+    // 처음 로드될 때 모든 데이터 부르기
     loadIp = async () =>{
         var tem = []
         axios({
@@ -92,14 +89,16 @@ class IPPolicy extends Component {
         })
         .then((res) => {
             // response  
-            res.data.forEach((item) => {
-                var ipInfo = { id: item.Id, ip: item.Ip };
-                tem = tem.concat(ipInfo)
-            })  
-            this.setState({
-                loading: true,
-                Iplist: tem
-            })
+            if(res.data != null){
+                res.data.forEach((item) => {
+                    var ipInfo = { id: item.Id, ip: item.Ip };
+                    tem = tem.concat(ipInfo)
+                })  
+                this.setState({
+                    loading: true,
+                    Iplist: tem
+                })
+            }
         }).catch((error) => {
             alert('에러발생\n관리자에게 문의해주세요')
             console.log(error)
@@ -108,18 +107,6 @@ class IPPolicy extends Component {
             })
         })
     }
-    // handleIPAdd = (newIp) => {
-    //     this.setState((state) => ({
-    //         ips: state.ips.concat(newIp)
-    //     }))
-    // }
-    // handleIPRemove = (ipIndex) => {
-    //     this.setState((state) => ({
-    //         ips: state.ips.filter((_, idx) => {
-    //             return idx !== ipIndex
-    //         })
-    //     }))
-    // }
 
     componentDidMount(){
         this.loadIp();
@@ -127,13 +114,11 @@ class IPPolicy extends Component {
 
     render() {
         const {Iplist} = this.state;
-        console.log(Iplist)
         return (
             <div>
                 <IPAdder
-                // handleIPAdd={this.handleIPAdd} 
-                 /><br/>
-                <IPList Ipitem={Iplist}/>
+                    loadIp={this.loadIp} /><br/>
+                <IPList Ipitem={Iplist} loadIp={this.loadIp} />
             </div>
         );
     }
