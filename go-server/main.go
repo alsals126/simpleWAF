@@ -1,7 +1,8 @@
 package main
 
 import (
-	"simpleWAF/go-server/ip"
+	"simpleWAF/policy/log"
+	"simpleWAF/policy/policydb"
 
 	echo "github.com/labstack/echo"
 	middleware "github.com/labstack/echo/middleware"
@@ -18,9 +19,11 @@ func main() {
 
 	// Routes
 	e.File("/", "ui/html/main.html")
-	e.GET("/ip-proxy", ip.GetIpProxy)
-	e.POST("/ip-proxy", ip.AddIpProxy)
-	e.DELETE("/ip-proxy/:id", ip.DeleteIpProxy)
+	e.GET("/ip-proxy", policydb.GetPolicy)
+	e.POST("/ip-proxy", policydb.AddPolicy)
+	e.DELETE("/ip-proxy/:id", policydb.DeletePolicy)
+
+	e.GET("/log/*", log.Log)
 
 	// Start Server
 	e.Start(":8080")
