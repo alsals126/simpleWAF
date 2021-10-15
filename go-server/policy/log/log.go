@@ -1,11 +1,11 @@
 package log
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"simpleWAF/middleware"
-	"simpleWAF/policy/policydb"
 
 	echo "github.com/labstack/echo"
 )
@@ -13,77 +13,79 @@ import (
 type LogResult struct {
 	Id        int
 	Ip        string
-	StartTime time.Time
-	EndTime   time.Time
+	StartDate time.Time
+	EndDate   time.Time
+	Time      time.Time
 	Policy    string
 }
 
 func Log(c echo.Context) error {
-	// var id int
-	var result policydb.IP
-	//var ip string
-	// var startTime time.Time
-	// var endTime time.Time
-	// var policy string
-	//var err error
+	var result LogResult
+	var err error
 	db := middleware.DbConnection()
 
 	// param인자: optional (ip, time)
 	qParams := c.QueryParams()
 	if val, ok := qParams["ip"]; ok {
-		ip.Ip = val[0]
+		result.Ip = val[0]
 	}
-	// if val, ok := qParams["startTime"]; ok {
-	// 	startTime, err = time.Parse("0001-01-01 00:00:00 +0000 UTC", val[0])
-	// 	if err != nil {
-	// 		log.Printf("DB ERRROR1 : %v\n", err)
-	// 		return err
-	// 	}
-	// }
-	// if val, ok := qParams["endTime"]; ok {
-	// 	endTime, err = time.Parse("0001-01-01 00:00:00 +0000 UTC", val[0])
-	// 	if err != nil {
-	// 		log.Printf("DB ERRROR1 : %v\n", err)
-	// 		return err
-	// 	}
-	// }
-	if val, ok := qParams["policy"]; ok {
-		ip.Policy = val[0]
-	}
-
-	// dbWhere := ""
-	// if ip != "" {
-	// 	if ip == "" {
-	// 		dbWhere = "WHERE date > "
-	// 	}
-	// } else {
-
-	// }
-
-	if ip != "" {
-		// query := "SELECT id, ip, time FROM ipproxy WHERE ip LIKE '" + ip + "%'"
-		// rows, err := db.Query(query)
-		rows, err := db.Query("SELECT ip, policy FROM ipproxy WHERE ip LIKE $1", ip+"%")
+	if val, ok := qParams["startDate"]; ok {
+		result.StartDate, err = time.Parse("0001-01-01 00:00:00 +0000 UTC", val[0])
 		if err != nil {
-			log.Printf("DB ERRROR2 : %v\n", err)
+			log.Printf("DB ERRROR1 : %v\n", err)
 			return err
 		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err := rows.Scan(&ip.Ip, &ip.Policy)
-			if err != nil {
-				// 여기서 오류남
-				log.Printf("DB ERRROR3 : %v\n", err)
-				return err
-				// return errors.New("DB ERROR3")
-			}
+	}
+	if val, ok := qParams["endDate"]; ok {
+		result.EndDate, err = time.Parse("0001-01-01 00:00:00 +0000 UTC", val[0])
+		if err != nil {
+			log.Printf("DB ERRROR1 : %v\n", err)
+			return err
 		}
 	}
-	return nil
 
+	dbWhere := ""
+	if result.Ip != "" {
+		dbWhere += "WHERE ip LIKE '" + result.Ip + "%'"
+
+		if whereTime(result) != "" {
+			dbWhere += "AND" + whereTime(result)
+		}
+	} else {
+		dbWhere += "WHERE" + whereTime(result)
+	}
+
+	rows, err := db.Query("SELECT ip, time, policy FROM ipproxy " + dbWhere)
+	if err != nil {
+		log.Printf("DB ERRROR2 : %v\n", err)
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&result.Ip, &result.Time, &result.Policy)
+		if err != nil {
+			log.Printf("DB ERRROR3 : %v\n", err)
+			return err
+			// return errors.New("DB ERROR3")
+		}
+	}
+
+	fmt.Println(result)
+
+	return nil
 }
 
-func where() {
+func whereTime(result LogResult) string {
+	str := ""
 
+	if !result.StartDate.IsZero() && !result.EndDate.IsZero() { // 시작기간, 끝기간 둘 다 있을 때
+		str += fmt.Sprintf("%v <= time <= %v", result.StartDate, result.EndDate)
+	} else if !result.StartDate.IsZero() { // 시작기간만 있을 때
+		str += fmt.Sprintf("%v <= time", result.StartDate)
+	} else if !result.EndDate.IsZero() { // 끝기간만 있을 때
+		str += fmt.Sprintf("time <= %v", result.EndDate)
+	}
+
+	return str
 }
