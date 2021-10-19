@@ -23,7 +23,7 @@ func main() {
 	e.POST("/ip-proxy", policydb.AddPolicy)
 	e.DELETE("/ip-proxy/:id", policydb.DeletePolicy)
 
-	e.GET("/log/*", log.Log)
+	e.GET("/log", log.Log)
 
 	// Start Server
 	e.Start(":8080")

@@ -7,23 +7,14 @@ import (
 	"time"
 
 	"simpleWAF/middleware"
+	"simpleWAF/models"
 
 	echo "github.com/labstack/echo"
 	_ "github.com/lib/pq"
 )
 
-type IP struct {
-	Id     int
-	Ip     string
-	Time   time.Time
-	Policy string
-}
-type IPs struct {
-	Ips []IP
-}
-
 func GetPolicy(c echo.Context) error {
-	var ips []IP
+	var ips []models.IP
 	db := middleware.DbConnection()
 
 	rows, err := db.Query("SELECT * FROM ipproxy")
@@ -42,7 +33,7 @@ func GetPolicy(c echo.Context) error {
 		if err != nil {
 			return errors.New("DB ERROR2")
 		}
-		ips = append(ips, IP{
+		ips = append(ips, models.IP{
 			Id:     id,
 			Ip:     ip,
 			Time:   time,
