@@ -8,11 +8,17 @@ function MainView(){
     function moveToLog(e){
         window.location.href = '/log'
     }
+
+    let option_id = [0, 1];
+    let options = [{name: '정책설정'}, {name: 'IP 차단 정책'}];
+    let selectedOptionId = 0
+
     return(
         <div>
-            <select style={{width: '140px'}} onChange={moveToIp}>
-                <option value="" selected disabled hidden>정책설정</option>
-                <option value="ip">IP 차단 정책</option>
+            <select defaultValue={selectedOptionId} style={{width: '140px'}} onChange={moveToIp}>
+                {option_id.map(id =>
+                    id == 0 ? <option key={id} value={id} disabled>{options[id].name}</option> : <option key={id} value={id}>{options[id].name}</option>
+                )}
             </select>&nbsp;&nbsp;
             <button style={{width: '140px'}} onClick={moveToLog}>로그</button>&nbsp;&nbsp;
             <button style={{width: '140px'}}>보고서</button>

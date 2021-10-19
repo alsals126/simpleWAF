@@ -1,70 +1,66 @@
-import React, { useState} from 'react'
+import React, { useState, useEffect } from 'react'
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
+import moment from 'moment';
 import "../css/logview.css"
 
 let endpoint = "http://127.0.0.1:8080";
 
-function dataAccess(ip, startDate, endDate) {
-    const param = new URLSearchParams();
-    console.log(ip)
+function DataAccess(ip, startDate, endDate, setTableDate) {
+    var query = ""
+    if(ip!=="" || startDate.toLocaleDateString()!==new Date().toLocaleDateString || endDate.toLocaleDateString()!==new Date().toLocaleDateString){
+        query += "?"
 
-    if(ip!="") {
-        param.append('ip', ip)
+        if(ip!=="") {
+            query += "ip="+ip
+        }
+        if(startDate.toLocaleDateString()!==new Date().toLocaleDateString) {
+            if(ip!=="") query += "&"
+            query += "startDate="+moment(startDate).format('YYYY-MM-DD')
+        }
+        if(endDate.toLocaleDateString()!==new Date().toLocaleDateString) {
+            if(ip!=="" || startDate.toLocaleDateString()!==new Date().toLocaleDateString) 
+                query += "&"
+            query += "endDate="+ 
+                `${endDate.getFullYear()}-${
+                    (endDate.getMonth() + 1)>=10 ? (endDate.getMonth() + 1) : '0'+(endDate.getMonth() + 1)
+                }-${
+                    (endDate.getDate() + 1)>=10 ? (endDate.getDate() + 1) : '0'+(endDate.getDate() + 1)
+                }`
+        }    
     }
-    if(startDate!="날짜선택") {
-        param.append('startDate', startDate)
-    }
-    if(endDate!="날짜선택") {
-        param.append('endDate', endDate)
-    }    
 
-    console.log(param)
-    var tem = []
-        axios.get(endpoint+"/log", param)
-        .then((res) => {
-            // response  
-            // if(res.data != null){
-            //     res.data.forEach((item) => {
-            //         var ipInfo = { id: item.Id, ip: item.Ip };
-            //         tem = tem.concat(ipInfo)
-            //     })  
-            //     this.setState({
-            //         loading: true,
-            //         Iplist: tem
-            //     })
-            // }
-        }).catch((error) => {
-            alert('에러발생\n관리자에게 문의해주세요')
-            console.log(error)
-            // this.setState({
-            //     loading: false
-            // })
-        })
+    axios.get(endpoint+"/log"+query)
+    .then((res) => {
+        // response 
+        var tem = []
+
+        if(res.data != null){
+            res.data.forEach((item) => {
+                var data = { 
+                    ip: item.Ip,
+                    date: item.Time,
+                    policy: item.Policy
+                };
+                tem = tem.concat(data)
+            })  
+        }
+        setTableDate(tem)
+    }).catch((error) => {
+        alert('에러발생\n관리자에게 문의해주세요')
+        console.log(error)
+    })
 }
 const DatePickerOne = (props) => {
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
-  
     const onChange1 = (start) => {
-        if (start <= endDate) {
-            setStartDate(start)
-            props.setStartText(
-                start.getFullYear().toString() + '.'
-                    + (start.getMonth()+1).toString() + '.'
-                    + start.getDate().toString()
-            )
+        if (start <= props.endDate) {
+            props.setStartDate(start)
         }
     }
     const onChange2 = (end) => {
-        if (startDate <= end) {
-            setEndDate(end)
-            props.setEndText(
-                end.getFullYear().toString() + '.'
-                    + (end.getMonth()+1).toString() + '.'
-                    + end.getDate().toString()
-            )
+        if (props.startDate <= end) {
+            props.setEndDate(end)
         }
     }
 
@@ -72,19 +68,19 @@ const DatePickerOne = (props) => {
         <>
             <DatePicker
                 selectsStart    
-                selected={startDate}
+                selected={props.startDate}
                 onChange={onChange1}
-                startDate={startDate}
-                endDate={endDate}
-                value={props.startText}
+                startDate={props.startDate}
+                endDate={props.endDate}
+                value={props.startDate.toLocaleDateString('ko-KR')}
             />
             <DatePicker
                 selectsEnd
-                selected={endDate}
+                selected={props.endDate}
                 onChange={onChange2}
-                startDate={startDate}
-                endDate={endDate}
-                value={props.endText}
+                startDate={props.startDate}
+                endDate={props.endDate}
+                value={props.endDate.toLocaleDateString('ko-KR')}
             />
         </>
     );
@@ -92,36 +88,50 @@ const DatePickerOne = (props) => {
 
 function LogView() {
     const [ip, setIp] = useState("")
-    const [startText, setStartText] = useState("날짜선택")
-    const [endText, setEndText] = useState("날짜선택")
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [tableDate, setTableDate] = useState([{
+        ip: '',
+        date: '',
+        policy: ''
+    }])
+    
+    const handleClick = () => DataAccess(ip, startDate, endDate, setTableDate)
 
-    const onChangeIp = (e) =>{
-        setIp(e.target.value);
-        console.log(ip);
-        dataAccess(ip, startText, endText);
-    }
+    useEffect(()=>{
+        DataAccess(ip, startDate, endDate, setTableDate)
+    },[]);
 
     return (
         <div>
-            IP <input type="text" value={ip} onChange={onChangeIp
-            }/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            IP <input type="text" value={ip} onChange={({ target: { value } }) => setIp(value)} />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             기간
             <div className="date">
                 <DatePickerOne 
-                    startText={startText} setStartText={setStartText}
-                    endText={endText} setEndText={setEndText}
+                    startDate={startDate} setStartDate={setStartDate}
+                    endDate={endDate} setEndDate={setEndDate}
                 />
             </div>
+            <button onClick={handleClick}>검색</button>
             <br/><br/>
-            <table border="1">
-                <th>IP</th>
-                <th>시간</th>
-                <th>사유</th>
-                <tr>
-                    <td>10.101.101.10</td>
-                    <td>202.09.45 21:50:54</td>
-                    <td>Ip</td>
-                </tr>
+            <table border="1" style={{textAlign:'center'}}>
+                <thead>
+                    <tr>
+                        <th style={{minWidth:'100px'}}>IP</th>
+                        <th style={{minWidth:'200px'}}>시간</th>
+                        <th style={{minWidth:'100px'}}>사유</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {tableDate.map(({ ip, date, policy }) => (
+                        <tr key={ip + date + policy}>
+                            <td>{ip}</td>
+                            <td>{date.substring(0,19).replace('T', ' ')}</td>
+                            <td>{policy}</td>
+                        </tr>
+                    ))}
+                </tbody>
             </table>
         </div>
     );

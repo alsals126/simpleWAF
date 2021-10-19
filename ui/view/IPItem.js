@@ -3,29 +3,28 @@ import axios from "axios";
 
 function IpItem({id, ip, loadIp}){
     return(
-        <li>
-            <span>{ip}</span>
-            <button onClick={()=> //여기서 중괄호 쓰면 안됨
-                deleteIp(id) ? loadIp() : null
-            }>X</button>
-        </li>
+        <>
+            <td style={{width:'150px'}}>
+                <span>{ip}</span>
+            </td>
+            <td style={{width:'30px'}}>
+                <button onClick={()=> //여기서 중괄호 쓰면 안됨
+                    deleteIp(id, loadIp)
+                }>X</button>
+            </td>
+        </>
     );
 }
 
-const deleteIp = (id) => {
-    var result = true
-
-    // delete 요청 보내기
-    axios.delete('http://127.0.0.1:8080/ip-proxy/' + id)
-    .then(function (response) {
-        // response    
-    }).catch((error) => {
-        result = false
-
-        alert('에러발생\n관리자에게 문의해주세요')
-        console.log(error)
-    });
-    return result
+const deleteIp = async (id, loadIp) => {
+    try{
+        // delete 요청 보내기
+        const data = await axios.delete('http://127.0.0.1:8080/ip-proxy/' + id);
+        console.log(data)
+        if (data.status === 200) loadIp()
+    }catch{
+        return false
+    }
 }
 
 export default IpItem;
