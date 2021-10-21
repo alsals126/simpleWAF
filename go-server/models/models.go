@@ -7,13 +7,19 @@ type LogResult struct {
 	Ip        string
 	StartDate time.Time
 	EndDate   time.Time
-	Time      time.Time
+	Date      time.Time
 	Policy    string
 }
 
-type IP struct {
+type IPblock struct {
 	Id     int
 	Ip     string
-	Time   time.Time
+	Policy string
+}
+
+type UserCustom struct {
+	Id     int
+	Field  string
+	Rule   string
 	Policy string
 }

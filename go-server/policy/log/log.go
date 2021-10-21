@@ -1,5 +1,9 @@
 package log
 
+// 로그는 proxy_log테이블로 해야함
+// proxy_ipblock테이블이 아님
+// 일단 오류천지야 여기
+// 절대 건들 ㄴㄴㄴㄴㄴㄴㄴㄴㄴ
 import (
 	"fmt"
 	"log"
@@ -13,7 +17,7 @@ import (
 )
 
 func Log(c echo.Context) error {
-	var ips []models.IP
+	var ips []models.LogResult
 	db := middleware.DbConnection()
 
 	// param인자: optional (ip, time)
@@ -41,19 +45,16 @@ func Log(c echo.Context) error {
 
 	// where문 설정
 	dbWhere := ""
+	time := whereTime(result)
 	if result.Ip != "" {
 		dbWhere += "WHERE ip LIKE '" + result.Ip + "%'"
-
-		if whereTime(result) != "" {
-			dbWhere += "AND " + whereTime(result)
-		}
+		dbWhere += "AND " + time
 	} else {
-		dbWhere += "WHERE " + whereTime(result)
+		dbWhere += "WHERE " + time
 	}
-	fmt.Println(dbWhere)
 
 	// 쿼리문
-	rows, err := db.Query("SELECT ip, time, policy FROM ipproxy " + dbWhere)
+	rows, err := db.Query("SELECT ip, date, policy FROM proxy_log " + dbWhere)
 	if err != nil {
 		log.Printf("DB ERRROR2 : %v\n", err)
 		return err
@@ -61,18 +62,17 @@ func Log(c echo.Context) error {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&result.Ip, &result.Time, &result.Policy)
+		err := rows.Scan(&result.Ip, &result.Date, &result.Policy)
 		if err != nil {
 			log.Printf("DB ERRROR3 : %v\n", err)
 			return err
 			// return errors.New("DB ERROR3")
 		}
-		ips = append(ips, models.IP{
+		ips = append(ips, models.LogResult{
 			Ip:     result.Ip,
-			Time:   result.Time,
+			Date:   result.Date,
 			Policy: result.Policy,
 		})
-		fmt.Println(ips)
 	}
 
 	return c.JSON(http.StatusOK, ips)
@@ -82,7 +82,7 @@ func whereTime(result models.LogResult) string {
 	str := ""
 
 	if !result.StartDate.IsZero() && !result.EndDate.IsZero() { // 시작기간, 끝기간 둘 다 있을 때
-		str += fmt.Sprintf("time between to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS') and to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS')", result.StartDate, result.EndDate)
+		str += fmt.Sprintf("date between to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS') and to_timestamp('%v', 'YYYY-MM-DD HH24:MI:SS')", result.StartDate, result.EndDate)
 	}
 
 	return str

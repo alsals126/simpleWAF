@@ -1,8 +1,9 @@
 package main
 
 import (
+	"simpleWAF/policy/ipblock"
 	"simpleWAF/policy/log"
-	"simpleWAF/policy/policydb"
+	"simpleWAF/policy/usercustom"
 
 	echo "github.com/labstack/echo"
 	middleware "github.com/labstack/echo/middleware"
@@ -11,17 +12,19 @@ import (
 func main() {
 	e := echo.New()
 
-	e.Static("/", "/ui/")
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
 	// Routes
-	e.File("/", "ui/html/main.html")
-	e.GET("/ip-proxy", policydb.GetPolicy)
-	e.POST("/ip-proxy", policydb.AddPolicy)
-	e.DELETE("/ip-proxy/:id", policydb.DeletePolicy)
+	e.GET("/ip-block", ipblock.GetPolicy)
+	e.POST("/ip-block", ipblock.AddPolicy)
+	e.DELETE("/ip-block/:id", ipblock.DeletePolicy)
+
+	e.GET("/user-custom", usercustom.GetPolicy)
+	e.POST("/user-custom", usercustom.AddPolicy)
+	e.DELETE("/user-custom/:id", usercustom.DeletePolicy)
 
 	e.GET("/log", log.Log)
 
