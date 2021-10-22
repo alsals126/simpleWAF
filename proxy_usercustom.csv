@@ -1,0 +1,6 @@
+id,field,rule,policy
+38,User-Agent,Chrome,사용자정의탐지(dasf)
+39,URI,example,사용자정의탐지(asdf)
+40,User-Agent,example,사용자정의탐지(asdfasdf)
+41,User-Agent,Firefox,사용자정의탐지(aa)
+42,User-Agent,Safari,사용자정의탐지(d)
