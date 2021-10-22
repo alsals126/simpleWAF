@@ -40,7 +40,7 @@ function DataAccess(ip, startDate, endDate, setTableDate) {
             res.data.forEach((item) => {
                 var data = { 
                     ip: item.Ip,
-                    date: item.Time,
+                    date: item.Date,
                     policy: item.Policy
                 };
                 tem = tem.concat(data)
@@ -127,7 +127,7 @@ function LogView() {
                     {tableDate.map(({ ip, date, policy }) => (
                         <tr key={ip + date + policy}>
                             <td>{ip}</td>
-                            <td>{date.substring(0,19).replace('T', ' ')}</td>
+                            <td style={{textAlign:'left'}}>{date.replace('T', ' ').replace('Z', '')}</td>
                             <td>{policy}</td>
                         </tr>
                     ))}
