@@ -1,9 +1,5 @@
 package log
 
-// 로그는 proxy_log테이블로 해야함
-// proxy_ipblock테이블이 아님
-// 일단 오류천지야 여기
-// 절대 건들 ㄴㄴㄴㄴㄴㄴㄴㄴㄴ
 import (
 	"fmt"
 	"log"
@@ -54,7 +50,7 @@ func Log(c echo.Context) error {
 	}
 
 	// 쿼리문
-	rows, err := db.Query("SELECT ip, date, policy FROM proxy_log " + dbWhere)
+	rows, err := db.Query("SELECT * FROM proxy_log " + dbWhere)
 	if err != nil {
 		log.Printf("DB ERRROR2 : %v\n", err)
 		return err
@@ -62,13 +58,14 @@ func Log(c echo.Context) error {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&result.Ip, &result.Date, &result.Policy)
+		err := rows.Scan(&result.Id, &result.Ip, &result.Date, &result.Policy)
 		if err != nil {
 			log.Printf("DB ERRROR3 : %v\n", err)
 			return err
 			// return errors.New("DB ERROR3")
 		}
 		ips = append(ips, models.LogResult{
+			Id:     result.Id,
 			Ip:     result.Ip,
 			Date:   result.Date,
 			Policy: result.Policy,

@@ -4,6 +4,7 @@ import "time"
 
 type LogResult struct {
 	Id        int
+	Key       int
 	Ip        string
 	StartDate time.Time
 	EndDate   time.Time
