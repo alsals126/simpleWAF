@@ -16,13 +16,15 @@ function MainView(){
 
     return(
         <div>
+            <h3> * IP차단 → 사용자정의탐지 순으로 탐색이 됩니다 * </h3>
+
             <select defaultValue={selectedOptionId} style={{width: '140px'}} onChange={moveToIp}>
                 {option_id.map(id =>
                     id === 0 ? <option key={id} value={id} disabled>{options[id].name}</option> : <option key={id} value={id}>{options[id].name}</option>
                 )}
             </select>&nbsp;&nbsp;
             <button style={{width: '140px'}} onClick={moveToLog}>로그</button>&nbsp;&nbsp;
-            <button style={{width: '140px'}}>통계</button>
+            {/* <button style={{width: '140px'}}>통계</button> */}
         </div>
     )
 }

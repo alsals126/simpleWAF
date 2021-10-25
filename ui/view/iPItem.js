@@ -4,10 +4,10 @@ import axios from "axios";
 function IpItem({id, ip, loadIp}){
     return(
         <>
-            <td style={{width:'150px'}}>
+            <td style={{width:'150px', borderBottom: '1px dotted #444444', padding: '8px'}}>
                 <span>{ip}</span>
             </td>
-            <td style={{width:'30px'}}>
+            <td style={{width:'30px', borderBottom: '1px dotted #444444', padding: '8px'}}>
                 <button onClick={()=> //여기서 중괄호 쓰면 안됨
                     deleteIp(id, loadIp)
                 }>X</button>

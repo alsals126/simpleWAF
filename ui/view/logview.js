@@ -39,6 +39,7 @@ function DataAccess(ip, startDate, endDate, setTableDate) {
         if(res.data != null){
             res.data.forEach((item) => {
                 var data = { 
+                    id: item.Id,
                     ip: item.Ip,
                     date: item.Date,
                     policy: item.Policy
@@ -91,6 +92,7 @@ function LogView() {
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
     const [tableDate, setTableDate] = useState([{
+        id: 0,
         ip: '',
         date: '',
         policy: ''
@@ -103,32 +105,32 @@ function LogView() {
     },[]);
 
     return (
-        <div>
+        <div style={{position: 'absolute', left: '2%', top: '3%'}}>
             IP <input type="text" value={ip} onChange={({ target: { value } }) => setIp(value)} />
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             기간
-            <div className="date">
+            <div className="date" style={{marginBottom:'10px'}}>
                 <DatePickerOne 
                     startDate={startDate} setStartDate={setStartDate}
                     endDate={endDate} setEndDate={setEndDate}
                 />
             </div>
-            <button onClick={handleClick}>검색</button>
+            <button onClick={handleClick} style={{width:'130px', marginLeft: '410px'}}>검색</button>
             <br/><br/>
-            <table border="1" style={{textAlign:'center'}}>
+            <table style={{textAlign:'center',  borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
                 <thead>
                     <tr>
-                        <th style={{minWidth:'100px'}}>IP</th>
-                        <th style={{minWidth:'200px'}}>시간</th>
-                        <th style={{minWidth:'100px'}}>사유</th>
+                        <th style={{minWidth:'100px', borderBottom: '1px solid #444444'}}>IP</th>
+                        <th style={{minWidth:'200px', borderBottom: '1px solid #444444'}}>시간</th>
+                        <th style={{minWidth:'100px', borderBottom: '1px solid #444444'}}>사유</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {tableDate.map(({ ip, date, policy }) => (
-                        <tr key={ip + date + policy}>
-                            <td>{ip}</td>
-                            <td style={{textAlign:'left'}}>{date.replace('T', ' ').replace('Z', '')}</td>
-                            <td>{policy}</td>
+                    {tableDate.map(({ id, ip, date, policy }) => (
+                        <tr key={id + ip + date + policy}>
+                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{ip}</td>
+                            <td style={{textAlign:'left', borderBottom: '1px dotted #444444', padding: '8px'}}>{date.replace('T', ' ').replace('Z', '')}</td>
+                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{policy}</td>
                         </tr>
                     ))}
                 </tbody>

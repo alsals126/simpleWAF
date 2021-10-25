@@ -8,7 +8,13 @@ class IPList extends Component {
     render() {
         const { Ipitem } = this.props;
         return (
-            <table>
+            <table style={{width: '300px', borderTop: '1px solid #444444',  borderCollapse: 'collapse' }}>
+                <thead>
+                    <tr>
+                        <th style={{borderBottom: '1px solid #444444'}}>IP</th>
+                        <th style={{borderBottom: '1px solid #444444'}}></th>
+                    </tr>
+                </thead>
                 <tbody>
                     {Ipitem.map((itemdata) => {
                         return(
@@ -81,7 +87,11 @@ class IPAdder extends Component {
     render() {
         return (
             <div>
-                <input type='text' value={this.state.ip} onChange={this.handleChange} onKeyPress={this.onKeyPress} />
+                <input type='text' 
+                    value={this.state.ip} 
+                    onChange={this.handleChange} 
+                    onKeyPress={this.onKeyPress} 
+                />
                 <button onClick={this.onClick}>Add</button>
             </div>
         )
@@ -105,7 +115,6 @@ class IPPolicy extends Component {
         })
         .then((res) => {
             // response  
-            console.log(res)
             if(res.data != null){
                 res.data.forEach((item) => {
                     var ipInfo = { id: item.Id, ip: item.Ip };
@@ -133,7 +142,7 @@ class IPPolicy extends Component {
     render() {
         const {Iplist} = this.state;
         return (
-            <div>
+            <div style={{position: 'absolute', left: '2%', top: '5%'}}>
                 <IPAdder
                     loadIp={this.loadIp} /><br/>
                 <IPList Ipitem={Iplist} loadIp={this.loadIp} />

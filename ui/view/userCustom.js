@@ -68,7 +68,7 @@ const deleteIp = async (id, setTableDate) => {
 
 function UserCustom(){
     let option_id = [0,1,2,3,4,5];
-    let options = [{name: '필드를 선택하세요'}, {name: 'User-Agent'}, {name: 'Cookie'}, {name: 'Host'}, {name: 'URI'}, {name: 'Method'}];
+    let options = [{name: '필드를 선택하세요'}, {name: 'Cookie'}, {name: 'Host'}, {name: 'URI'}, {name: 'User-Agent'}, {name: 'Method'}];
     let selectedOptionId = 0
     const [optionsIndex, setOptionsIndex] = useState(0)
     const [policyName, setPolicyName] = useState("")
@@ -90,7 +90,7 @@ function UserCustom(){
     }
 
     return(
-        <div>
+        <div style={{position: 'absolute', left: '2%', top: '3%'}}>
             <div style={{float:'left'}}>
                 정책이름<br/>
                 <input type="text" placeholder="정책이름" onChange={({ target: { value } }) => setPolicyName(value)} value={policyName} onKeyPress={onKeyPress}/>
@@ -102,7 +102,7 @@ function UserCustom(){
                     {option_id.map(id =>
                         id === 0 ? <option key={id} value={id} disabled>{options[id].name}</option> : <option key={id} value={id}>{options[id].name}</option>
                     )}
-                </select>&nbsp;&nbsp;
+                </select>&nbsp;
             </div>
             <div style={{float:'left'}}>
                 <span style={{color:'white'}}>줄맞추기</span><br/>
@@ -113,23 +113,24 @@ function UserCustom(){
                 }     
                 <button onClick={() => insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)}>Add</button>
             </div>
-            <br/><br/><br/>
-            <table border="1" style={{textAlign:'center'}}>
+            <br/><br/><br/><br/>
+            * 탐지순서는 필드순<span style={{fontSize: '13px'}}>(Cookie, Host, URI, User-Agent, Method)</span>으로 진행됩니다.
+            <table style={{textAlign:'center', borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
                 <thead>
                     <tr>
-                        <th style={{minWidth:'150px'}}>정책명</th>
-                        <th style={{minWidth:'100px'}}>필드</th>
-                        <th style={{minWidth:'200px'}}>규칙</th>
-                        <th></th>
+                        <th style={{minWidth:'150px', borderBottom: '1px solid #444444'}}>정책명</th>
+                        <th style={{minWidth:'100px', borderBottom: '1px solid #444444'}}>필드</th>
+                        <th style={{minWidth:'200px', borderBottom: '1px solid #444444'}}>규칙</th>
+                        <th style={{minWidth:'35px', borderBottom: '1px solid #444444'}}></th>
                     </tr>
                 </thead>
                 <tbody>
                     {tableDate.map(({id, policy, field, rule}) => (
                         <tr key={id + policy + field + rule}>
-                            <td>{policy}</td>
-                            <td>{field}</td>
-                            <td>{rule}</td>
-                            <td>
+                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{policy}</td>
+                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{field}</td>
+                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{rule}</td>
+                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>
                                 <button onClick={()=> deleteIp(id, setTableDate) }>X</button>
                             </td>
                         </tr>
