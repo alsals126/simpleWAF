@@ -1,4 +1,3 @@
-// ip차단정책 가능
 package waf
 
 import (
@@ -14,12 +13,10 @@ import (
 )
 
 type Waf struct {
-	key int
-
 	Proxy  *httputil.ReverseProxy
 	db     *sql.DB
 	ip     string
-	policy map[int][]string
+	policy string
 }
 type Rule struct {
 	id   int
@@ -28,38 +25,19 @@ type Rule struct {
 
 // handler
 func (waf *Waf) Handler(w http.ResponseWriter, r *http.Request) {
-	waf.policy = make(map[int][]string)
+	waf.policy = "" //policy 초기화
 	waf.dbConnection()
-	waf.getKey()
 
 	waf.ip = strings.Split(getIP(r), ":")[0]
+	waf.whatPolicy(r)
 
-	if waf.whatPolicy(r) {
+	fmt.Println(r)
+	if waf.policy != "" {
 		fmt.Fprintln(w, "<h1>BLOCK</h1>")
 	} else {
 		waf.Proxy.ServeHTTP(w, r)
 	}
 	waf.logInsert()
-}
-
-// key값 구하기
-// 같은 request인 것을 알기 위해
-func (waf *Waf) getKey() {
-	var s sql.NullInt64
-	err := waf.db.QueryRow("SELECT key FROM proxy_log ORDER BY key DESC LIMIT 1").Scan(&s)
-
-	// null인지 아닌지
-	if s.Valid {
-		waf.key = (int)(s.Int64) + 1
-	} else {
-		waf.key = 1
-	}
-
-	fmt.Println(waf.key)
-	if err != nil {
-		log.Printf("DB ERRROR(KEY): %v\n", err)
-	}
-
 }
 
 func (waf *Waf) dbConnection() {
@@ -85,34 +63,38 @@ func getIP(r *http.Request) string {
 	return IPAddress
 }
 
-func (waf *Waf) whatPolicy(r *http.Request) bool {
+func (waf *Waf) whatPolicy(r *http.Request) {
+	//ip차단 정책
+	var p sql.NullString
+	err := waf.db.QueryRow("SELECT policy FROM proxy_ipblock WHERE ip=$1", waf.ip).Scan(&p)
+
+	if p.Valid { //ip가 있으면 차단
+		waf.policy = p.String
+		return
+	}
+	if err != nil {
+		log.Printf("DB ERRROR(IP BLOCK): %v\n", err)
+	}
+
 	// 사용자정의탐지 정책
 	var tem = map[string]string{
-		"User-Agent": r.Header.Get("User-Agent"),
 		"Cookie":     r.Header.Get("Cookie"),
 		"Host":       r.Host,
 		"URI":        r.RequestURI,
+		"User-Agent": r.Header.Get("User-Agent"),
 		"Method":     r.Method,
 	}
 
 	for key, val := range tem {
-		waf.policy[waf.key] = append(waf.policy[waf.key], waf.getUserCustom(key, val)...)
-	}
-
-	//ip차단 정책
-	var p string
-	err := waf.db.QueryRow("SELECT policy FROM proxy_ipblock WHERE ip=$1", waf.ip).Scan(&p)
-	if err != nil {
-		log.Printf("DB ERRROR(IP BLOCK): %v\n", err)
-		return false
-	} else {
-		waf.policy[waf.key] = append(waf.policy[waf.key], p)
-		return true
+		if waf.policy != "" {
+			break
+		}
+		waf.policy = waf.getUserCustom(key, val)
 	}
 }
 
 // user custom
-func (waf Waf) getUserCustom(fieldName string, field string) []string {
+func (waf Waf) getUserCustom(fieldName string, field string) string {
 
 	// 규칙 구하기
 	var rule Rule
@@ -133,9 +115,12 @@ func (waf Waf) getUserCustom(fieldName string, field string) []string {
 	}
 
 	// 정책 구하기
-	var policy []string
+	var policy string
 
 	for _, value := range rules {
+		if policy != "" {
+			return policy
+		}
 		if strings.Contains(field, value.rule) {
 			rows, err := waf.db.Query("SELECT policy FROM proxy_usercustom WHERE id=$1", value.id)
 			if err != nil {
@@ -149,7 +134,9 @@ func (waf Waf) getUserCustom(fieldName string, field string) []string {
 				if err != nil {
 					log.Printf("DB ERRROR4(UserCustom) : %v\n", err)
 				}
-				policy = append(policy, p)
+				policy = p
+
+				break
 			}
 		}
 	}
@@ -158,10 +145,8 @@ func (waf Waf) getUserCustom(fieldName string, field string) []string {
 
 // 로그 insert
 func (waf Waf) logInsert() {
-	for _, value := range waf.policy[waf.key] {
-		_, err := waf.db.Exec("INSERT INTO proxy_log(key, ip, date, policy) VALUES($1, $2, $3, $4)", waf.key, waf.ip, time.Now(), value)
-		if err != nil {
-			log.Printf("DB ERRROR(INSERT): %v\n", err)
-		}
+	_, err := waf.db.Exec("INSERT INTO proxy_log(ip, date, policy) VALUES($1, $2, $3)", waf.ip, time.Now(), waf.policy)
+	if err != nil {
+		log.Printf("DB ERRROR(INSERT): %v\n", err)
 	}
 }
