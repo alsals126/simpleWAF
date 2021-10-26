@@ -50,7 +50,7 @@ func Log(c echo.Context) error {
 	}
 
 	// 쿼리문
-	rows, err := db.Query("SELECT * FROM proxy_log " + dbWhere)
+	rows, err := db.Query("SELECT * FROM proxy_log " + dbWhere + "order by date desc")
 	if err != nil {
 		log.Printf("DB ERRROR2 : %v\n", err)
 		return err
