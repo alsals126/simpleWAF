@@ -31,11 +31,16 @@ func (waf *Waf) Handler(w http.ResponseWriter, r *http.Request) {
 	waf.ip = strings.Split(getIP(r), ":")[0]
 	waf.whatPolicy(r)
 
-	fmt.Println(r)
 	if waf.policy != "" {
 		fmt.Fprintln(w, "<h1>BLOCK</h1>")
+		if waf.policy == "ip차단" {
+			fmt.Fprintln(w, "<h4>IP</h4>")
+		} else {
+			fmt.Fprintln(w, "<h4>", waf.policy[:21], "</h4>")
+		}
 	} else {
 		waf.Proxy.ServeHTTP(w, r)
+		return
 	}
 	waf.logInsert()
 }
