@@ -105,6 +105,9 @@ class IPPolicy extends Component {
             Iplist: []
         };
     }
+    moveToIp = ()=>{
+        window.location.href = '/'
+    }
 
     // 처음 로드될 때 모든 데이터 부르기
     loadIp = () =>{
@@ -142,11 +145,15 @@ class IPPolicy extends Component {
     render() {
         const {Iplist} = this.state;
         return (
-            <div style={{position: 'absolute', left: '2%', top: '5%'}}>
-                <IPAdder
-                    loadIp={this.loadIp} /><br/>
-                <IPList Ipitem={Iplist} loadIp={this.loadIp} />
-            </div>
+            <>
+                <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{position: 'absolute', right:'2%', top: '2%', cursor:'pointer'}} onClick={this.moveToIp} alt="main" />
+                <div style={{position: 'absolute', left: '2%', top: '5%'}}>
+                    <IPAdder
+                        loadIp={this.loadIp} /><br/>
+                    <IPList Ipitem={Iplist} loadIp={this.loadIp} />
+                </div>
+            </>
+            
         );
     }
 }

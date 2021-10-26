@@ -88,56 +88,62 @@ function UserCustom(){
         if(e.key === 'Enter')
             insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)
     }
+    const moveToIp = ()=>{
+        window.location.href = '/'
+    }
 
     return(
-        <div style={{position: 'absolute', left: '2%', top: '3%'}}>
-            <div style={{float:'left'}}>
-                정책이름<br/>
-                <input type="text" placeholder="정책이름" onChange={({ target: { value } }) => setPolicyName(value)} value={policyName} onKeyPress={onKeyPress}/>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </div>
-            <div style={{float:'left'}}>
-                필드<br/>
-                <select defaultValue={selectedOptionId} onChange={(e) => {setOptionsIndex(e.target.value); setInputValue("")}}>
-                    {option_id.map(id =>
-                        id === 0 ? <option key={id} value={id} disabled>{options[id].name}</option> : <option key={id} value={id}>{options[id].name}</option>
-                    )}
-                </select>&nbsp;
-            </div>
-            <div style={{float:'left'}}>
-                <span style={{color:'white'}}>줄맞추기</span><br/>
-                {
-                    optionsIndex===0 ? 
-                    <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} readOnly/> : 
-                    <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} />
-                }     
-                <button onClick={() => insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)}>Add</button>
-            </div>
-            <br/><br/><br/><br/>
-            * 탐지순서는 필드순<span style={{fontSize: '13px'}}>(Cookie, Host, URI, User-Agent, Method)</span>으로 진행됩니다.
-            <table style={{textAlign:'center', borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
-                <thead>
-                    <tr>
-                        <th style={{minWidth:'150px', borderBottom: '1px solid #444444'}}>정책명</th>
-                        <th style={{minWidth:'100px', borderBottom: '1px solid #444444'}}>필드</th>
-                        <th style={{minWidth:'200px', borderBottom: '1px solid #444444'}}>규칙</th>
-                        <th style={{minWidth:'35px', borderBottom: '1px solid #444444'}}></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tableDate.map(({id, policy, field, rule}) => (
-                        <tr key={id + policy + field + rule}>
-                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{policy}</td>
-                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{field}</td>
-                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{rule}</td>
-                            <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>
-                                <button onClick={()=> deleteIp(id, setTableDate) }>X</button>
-                            </td>
+        <>
+            <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{position: 'absolute', right:'2%', top: '2%', cursor:'pointer'}} onClick={moveToIp} alt="main" />
+            <div style={{position: 'absolute', left: '2%', top: '3%'}}>
+                <div style={{float:'left'}}>
+                    정책이름<br/>
+                    <input type="text" placeholder="정책이름" onChange={({ target: { value } }) => setPolicyName(value)} value={policyName} onKeyPress={onKeyPress}/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                <div style={{float:'left'}}>
+                    필드<br/>
+                    <select defaultValue={selectedOptionId} onChange={(e) => {setOptionsIndex(e.target.value); setInputValue("")}}>
+                        {option_id.map(id =>
+                            id === 0 ? <option key={id} value={id} disabled>{options[id].name}</option> : <option key={id} value={id}>{options[id].name}</option>
+                        )}
+                    </select>&nbsp;
+                </div>
+                <div style={{float:'left'}}>
+                    <span style={{color:'white'}}>줄맞추기</span><br/>
+                    {
+                        optionsIndex===0 ? 
+                        <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} readOnly/> : 
+                        <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} />
+                    }     
+                    <button onClick={() => insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)}>Add</button>
+                </div>
+                <br/><br/><br/><br/>
+                * 탐지순서는 필드순<span style={{fontSize: '13px'}}>(Cookie, Host, URI, User-Agent, Method)</span>으로 진행됩니다.
+                <table style={{textAlign:'center', borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
+                    <thead>
+                        <tr>
+                            <th style={{minWidth:'150px', borderBottom: '1px solid #444444'}}>정책명</th>
+                            <th style={{minWidth:'100px', borderBottom: '1px solid #444444'}}>필드</th>
+                            <th style={{minWidth:'200px', borderBottom: '1px solid #444444'}}>규칙</th>
+                            <th style={{minWidth:'35px', borderBottom: '1px solid #444444'}}></th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {tableDate.map(({id, policy, field, rule}) => (
+                            <tr key={id + policy + field + rule}>
+                                <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{policy}</td>
+                                <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{field}</td>
+                                <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{rule}</td>
+                                <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>
+                                    <button onClick={()=> deleteIp(id, setTableDate) }>X</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </>
     )
 }
 
