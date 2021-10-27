@@ -1,0 +1,4 @@
+id,field,rule,policy
+51,User-Agent,Postman,사용자정의탐지(post)
+52,User-Agent,Chrome,사용자정의탐지(Chrome)
+53,User-Agent,Safari,사용자정의탐지(Safari)
