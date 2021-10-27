@@ -88,22 +88,29 @@ function UserCustom(){
         if(e.key === 'Enter')
             insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)
     }
-    const moveToIp = ()=>{
-        window.location.href = '/'
-    }
 
     return(
         <>
-            <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{position: 'absolute', right:'2%', top: '2%', cursor:'pointer'}} onClick={moveToIp} alt="main" />
-            <div style={{position: 'absolute', left: '2%', top: '3%'}}>
+        
+            <div style={{position:'relative', width: '98%', backgroundColor:'lightgray', height:'15%', marginTop: '2%', padding:'13px', textAlign:'left'}}> 
+                <span onClick={()=>{ window.location.href = '/' }} style={{cursor:'pointer'}}>
+                    <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{position: 'absolute', cursor:'pointer'}} alt="Main Page" />
+                </span>&emsp;&emsp;&emsp;&emsp;&emsp;
+                <span onClick={()=>{ window.location.href = '/ip-block' }} style={{cursor:'pointer'}} >IP차단</span>&emsp;&emsp;&emsp;
+                <span onClick={()=>{ window.location.href = '/user-custom' }} style={{cursor:'pointer', fontWeight:'bold'}}>사용자정의탐지</span>&emsp;&emsp;&emsp;
+                <span onClick={()=>{ window.location.href = '/log' }} style={{cursor:'pointer'}}>로그</span>
+
+            </div>
+           
+            <div style={{position: 'absolute', width: '70%', left: '13%', top: '14%'}}>
                 <div style={{float:'left'}}>
                     정책이름<br/>
-                    <input type="text" placeholder="정책이름" onChange={({ target: { value } }) => setPolicyName(value)} value={policyName} onKeyPress={onKeyPress}/>
+                    <input type="text" placeholder="정책이름" onChange={({ target: { value } }) => setPolicyName(value)} value={policyName} onKeyPress={onKeyPress} style={{height: '20px'}}/>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </div>
                 <div style={{float:'left'}}>
                     필드<br/>
-                    <select defaultValue={selectedOptionId} onChange={(e) => {setOptionsIndex(e.target.value); setInputValue("")}}>
+                    <select defaultValue={selectedOptionId} onChange={(e) => {setOptionsIndex(e.target.value); setInputValue("")}} style={{height: '28px'}}>
                         {option_id.map(id =>
                             id === 0 ? <option key={id} value={id} disabled>{options[id].name}</option> : <option key={id} value={id}>{options[id].name}</option>
                         )}
@@ -113,14 +120,14 @@ function UserCustom(){
                     <span style={{color:'white'}}>줄맞추기</span><br/>
                     {
                         optionsIndex===0 ? 
-                        <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} readOnly/> : 
-                        <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} />
+                        <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} style={{height: '20px', marginRight:'1px'}} readOnly/> : 
+                        <input type="text" placeholder={options[optionsIndex].name} onChange={({ target: { value } }) => setInputValue(value)} value={inputValue} onKeyPress={onKeyPress} style={{height: '20px', marginRight:'1px'}} />
                     }     
-                    <button onClick={() => insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)}>Add</button>
+                    <button onClick={() => insertUserCustom(policyName, setPolicyName, options, optionsIndex, inputValue, setInputValue, setTableDate)} style={{height: '27px', cursor: 'pointer'}}>Add</button>
                 </div>
                 <br/><br/><br/><br/>
                 * 탐지순서는 필드순<span style={{fontSize: '13px'}}>(Cookie, Host, URI, User-Agent, Method)</span>으로 진행됩니다.
-                <table style={{textAlign:'center', borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
+                <table style={{width: '100%', textAlign:'center', borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
                     <thead>
                         <tr>
                             <th style={{minWidth:'150px', borderBottom: '1px solid #444444'}}>정책명</th>
@@ -136,7 +143,7 @@ function UserCustom(){
                                 <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{field}</td>
                                 <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{rule}</td>
                                 <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>
-                                    <button onClick={()=> deleteIp(id, setTableDate) }>X</button>
+                                    <button onClick={()=> deleteIp(id, setTableDate)} style={{cursor: 'pointer'}}>X</button>
                                 </td>
                             </tr>
                         ))}

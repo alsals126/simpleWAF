@@ -8,11 +8,10 @@ class IPList extends Component {
     render() {
         const { Ipitem } = this.props;
         return (
-            <table style={{width: '300px', borderTop: '1px solid #444444',  borderCollapse: 'collapse' }}>
+            <table style={{width: '100%', borderTop: '1px solid #444444',  borderCollapse: 'collapse' }}>
                 <thead>
                     <tr>
-                        <th style={{borderBottom: '1px solid #444444'}}>IP</th>
-                        <th style={{borderBottom: '1px solid #444444'}}></th>
+                        <th colSpan='2' style={{borderBottom: '1px solid #444444', padding: '3px'}}>IP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,8 +90,10 @@ class IPAdder extends Component {
                     value={this.state.ip} 
                     onChange={this.handleChange} 
                     onKeyPress={this.onKeyPress} 
+                    placeholder="IP주소를 입력하세요"
+                    style={{height: '20px', marginRight:'1px'}}
                 />
-                <button onClick={this.onClick}>Add</button>
+                <button onClick={this.onClick} style={{height: '27px', cursor: 'pointer'}}>&nbsp;Add&nbsp;</button>
             </div>
         )
     }
@@ -145,9 +146,17 @@ class IPPolicy extends Component {
     render() {
         const {Iplist} = this.state;
         return (
-            <>
-                <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{position: 'absolute', right:'2%', top: '2%', cursor:'pointer'}} onClick={this.moveToIp} alt="main" />
-                <div style={{position: 'absolute', left: '2%', top: '5%'}}>
+            <> <div style={{ position: 'relative', width: '98%', backgroundColor: 'lightgray', height: '15%', marginTop: '2%', padding: '13px', textAlign: 'left' }}>
+                <span onClick={() => { window.location.href = '/' }} style={{ cursor: 'pointer' }}>
+                    <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{ position: 'absolute', cursor: 'pointer' }} alt="Main Page" />
+                </span>&emsp;&emsp;&emsp;&emsp;&emsp;
+                <span onClick={() => { window.location.href = '/ip-block' }} style={{ cursor: 'pointer', fontWeight:'bold' }} >IP차단</span>&emsp;&emsp;&emsp;
+                <span onClick={() => { window.location.href = '/user-custom' }} style={{ cursor: 'pointer' }}>사용자정의탐지</span>&emsp;&emsp;&emsp;
+                <span onClick={() => { window.location.href = '/log' }} style={{ cursor: 'pointer' }}>로그</span>
+
+            </div>
+
+                <div style={{position: 'absolute', width: '70%', left: '13%', top: '14%'}}>
                     <IPAdder
                         loadIp={this.loadIp} /><br/>
                     <IPList Ipitem={Iplist} loadIp={this.loadIp} />

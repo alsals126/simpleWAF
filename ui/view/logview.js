@@ -3,7 +3,6 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 import moment from 'moment';
-import "../css/logview.css"
 
 let endpoint = "http://127.0.0.1:8080";
 
@@ -100,7 +99,7 @@ function LogView() {
         date: '',
         policy: ''
     }])
-    const [limit, setLimit] = useState(15)
+    const [limit, setLimit] = useState(13)
     const [table, setTable] = useState([{
         id: 0,
         ip: '',
@@ -110,17 +109,14 @@ function LogView() {
     
     const handleClick = () => 
         DataAccess(ip, startDate, endDate, setTableData, limit, setTable)
-  
-    const moveToIp = ()=>{
-        window.location.href = '/'
-    }
     const addHandleClick = () =>{
-        setLimit(limit+15) // limit이 바뀌면
+        setLimit(limit+13) // limit이 바뀌면
     }
 
     useEffect(()=>{
         DataAccess(ip, startDate, endDate, setTableData, limit, setTable)
     },[]);
+    
     useEffect(()=>{ // 얘가 실행
         setTable(tableData.filter(function(a, index, b){ //그럼 얘도 자동적으로 실행
             return index<limit;
@@ -129,20 +125,32 @@ function LogView() {
 
     return (
         <>
-            <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{position: 'absolute', right:'2%', top: '2%', cursor:'pointer'}} onClick={moveToIp} alt="main" />
-            <div style={{position: 'absolute', left: '2%', top: '3%'}}>
-                IP <input type="text" value={ip} onChange={({ target: { value } }) => setIp(value)} />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                기간
-                <div className="date" style={{marginBottom:'10px'}}>
+            <div style={{ position: 'relative', width: '98%', backgroundColor: 'lightgray', height: '15%', marginTop: '2%', padding: '13px', textAlign: 'left' }}>
+                <span onClick={() => { window.location.href = '/' }} style={{ cursor: 'pointer' }}>
+                    <img src="https://img.icons8.com/ios-glyphs/30/000000/home.png" style={{ position: 'absolute', cursor: 'pointer' }} alt="Main Page" />
+                </span>&emsp;&emsp;&emsp;&emsp;&emsp;
+                <span onClick={() => { window.location.href = '/ip-block' }} style={{ cursor: 'pointer' }} >IP차단</span>&emsp;&emsp;&emsp;
+                <span onClick={() => { window.location.href = '/user-custom' }} style={{ cursor: 'pointer' }}>사용자정의탐지</span>&emsp;&emsp;&emsp;
+                <span onClick={() => { window.location.href = '/log' }} style={{ cursor: 'pointer', fontWeight:'bold'}}>로그</span>
+
+            </div>
+            
+            <div style={{position: 'absolute', width: '70%', left: '13%', top: '14%'}}>
+                <div style={{width: '225px', float:'right', textAlign:'right'}}>
                     <DatePickerOne 
                         startDate={startDate} setStartDate={setStartDate}
                         endDate={endDate} setEndDate={setEndDate}
                     />
                 </div>
-                <button onClick={handleClick} style={{width:'130px', marginLeft: '410px'}}>검색</button>
+                <div style={{float:'right'}}>
+                    IP <input type="text" value={ip} onChange={({ target: { value } }) => setIp(value)} placeholder="ex)10 → '10'으로 시작하는 IP검색" />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    기간
+                </div>
+                <br/><br/><br/>
+                <button onClick={handleClick} style={{width:'100px', float: 'right'}}>검색</button>
                 <br/><br/>
-                <table style={{textAlign:'center',  borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
+                <table style={{width: '100%', textAlign:'center',  borderTop: '1px solid #444444',  borderCollapse: 'collapse'}}>
                     <thead>
                         <tr>
                             <th style={{minWidth:'150px', borderBottom: '1px solid #444444'}}>IP</th>
@@ -155,7 +163,13 @@ function LogView() {
                             table.map(({ id, ip, date, policy }) => (
                                 <tr key={id + ip + date + policy}>
                                     <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{ip}</td>
-                                    <td style={{textAlign:'left', borderBottom: '1px dotted #444444', padding: '8px'}}>{date.replace('T', ' ').replace('Z', '')}</td>
+                                    <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>
+                                        {
+                                            date.replace('T', ' ').replace('Z', '').length === 26 ? 
+                                                date.replace('T', ' ').replace('Z', '') : 
+                                                date.replace('T', ' ').replace('Z', '') + new Array(26-date.replace('T', ' ').replace('Z', '').length+1).join('0')
+                                        }
+                                    </td>
                                     <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{policy}</td>
                                 </tr>
                             ))
