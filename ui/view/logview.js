@@ -116,7 +116,7 @@ function LogView() {
     useEffect(()=>{
         DataAccess(ip, startDate, endDate, setTableData, limit, setTable)
     },[]);
-    
+
     useEffect(()=>{ // 얘가 실행
         setTable(tableData.filter(function(a, index, b){ //그럼 얘도 자동적으로 실행
             return index<limit;
@@ -165,7 +165,7 @@ function LogView() {
                                     <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>{ip}</td>
                                     <td style={{borderBottom: '1px dotted #444444', padding: '8px'}}>
                                         {
-                                            date.replace('T', ' ').replace('Z', '').length === 26 ? 
+                                            date.replace('T', ' ').replace('Z', '').length === 26 || date === '' ? 
                                                 date.replace('T', ' ').replace('Z', '') : 
                                                 date.replace('T', ' ').replace('Z', '') + new Array(26-date.replace('T', ' ').replace('Z', '').length+1).join('0')
                                         }

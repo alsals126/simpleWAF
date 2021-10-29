@@ -64,7 +64,7 @@ class IPAdder extends Component {
         bodyFormData.append('ip', this.state.ip);
         bodyFormData.append('policy', "ip차단")
 
-        await axios({
+        axios({
             method:"post",
             url:endpoint+"/ip-block",
             data: bodyFormData
